@@ -1,0 +1,53 @@
+// +build windows
+
+package wallpaper
+
+import "golang.org/x/sys/windows/registry"
+import "os"
+
+// SetFromFile sets the wallpaper for the current user to specified file by setting HKEY_CURRENT_USER\Control Panel\Desktop\Wallpaper.
+//
+// Note: this requires you to log out and in again.
+func SetFromFile(file string) (err error) {
+  key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.ALL_ACCESS)
+
+  if err != nil {
+    return
+  }
+
+  defer func() {
+    err = key.Close()
+  }()
+
+  err = key.SetStringValue("Wallpaper", file)
+
+  if err != nil {
+    return
+  }
+
+  // this is supposed to update the wallpaper, but i only got a black background
+  // err = exec.
+  //   Command("rundll32", "user32.dll,UpdatePerUserSystemParameters").
+  //   Run()
+  //
+  // if err != nil {
+  //   return
+  // }
+
+  return
+}
+
+// SetFromURL downloads url and calls SetFromFile.
+func SetFromURL(url string) error {
+  file, err := downloadImage(url)
+
+  if err != nil {
+    return err
+  }
+
+  return SetFromFile(file)
+}
+
+func getCacheDir() (string, error) {
+  return os.TempDir(), nil
+}
