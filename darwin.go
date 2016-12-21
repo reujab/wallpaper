@@ -1,6 +1,5 @@
 // +build darwin
 
-// Package wallpaper is UNTESTED on macOS.
 package wallpaper
 
 import "os/exec"

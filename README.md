@@ -32,5 +32,4 @@ func main() {
 ## Notes
 
 * On Windows and KDE, you must log out and in again for the background to update.
-* The macOS version has not been tested, so it may not work.
 * Enlightenment is not supported.
