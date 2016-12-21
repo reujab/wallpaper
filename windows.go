@@ -5,6 +5,27 @@ package wallpaper
 import "golang.org/x/sys/windows/registry"
 import "os"
 
+// Get gets the current wallpaper.
+func Get() (wallpaper string, err error) {
+  key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.READ)
+
+  if err != nil {
+    return
+  }
+
+  defer func() {
+    err = key.Close()
+  }()
+
+  wallpaper, _, err = key.GetStringValue("Wallpaper")
+
+  if err != nil {
+    return
+  }
+
+  return
+}
+
 // SetFromFile sets the wallpaper for the current user to specified file by setting HKEY_CURRENT_USER\Control Panel\Desktop\Wallpaper.
 //
 // Note: this requires you to log out and in again.
