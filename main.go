@@ -19,7 +19,7 @@ func downloadImage(url string) (filename string, err error) {
     return
   }
 
-  filename = filepath.Join(cacheDir, "bing-background.jpg")
+  filename = filepath.Join(cacheDir, filepath.Base(url))
 
   file, err := os.Create(filename)
 
