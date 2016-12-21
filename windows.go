@@ -9,7 +9,7 @@ import "os"
 //
 // Note: this requires you to log out and in again.
 func SetFromFile(file string) (err error) {
-  key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.ALL_ACCESS)
+  key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.WRITE)
 
   if err != nil {
     return
