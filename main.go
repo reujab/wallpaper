@@ -9,45 +9,46 @@ import "path/filepath"
 // Desktop contains the current desktop environment on Linux.
 // Empty string on all other operating systems.
 var Desktop = os.Getenv("XDG_CURRENT_DESKTOP")
+
 // ErrUnsupportedDE is thrown when Desktop is not a supported desktop environment.
 var ErrUnsupportedDE = errors.New("your desktop environment is not supported")
 
 func downloadImage(url string) (filename string, err error) {
-  cacheDir, err := getCacheDir()
+	cacheDir, err := getCacheDir()
 
-  if err != nil {
-    return
-  }
+	if err != nil {
+		return
+	}
 
-  filename = filepath.Join(cacheDir, filepath.Base(url))
+	filename = filepath.Join(cacheDir, filepath.Base(url))
 
-  file, err := os.Create(filename)
+	file, err := os.Create(filename)
 
-  if err != nil {
-    return
-  }
+	if err != nil {
+		return
+	}
 
-  defer func() {
-    err = file.Close()
-  }()
+	defer func() {
+		err = file.Close()
+	}()
 
-  res, err := http.Get(url)
+	res, err := http.Get(url)
 
-  if err != nil {
-    return
-  }
+	if err != nil {
+		return
+	}
 
-  defer func() {
-    err = res.
-      Body.
-      Close()
-  }()
+	defer func() {
+		err = res.
+			Body.
+			Close()
+	}()
 
-  _, err = io.Copy(file, res.Body)
+	_, err = io.Copy(file, res.Body)
 
-  if err != nil {
-    return
-  }
+	if err != nil {
+		return
+	}
 
-  return
+	return
 }
