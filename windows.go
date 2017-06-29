@@ -2,8 +2,11 @@
 
 package wallpaper
 
-import "golang.org/x/sys/windows/registry"
-import "os"
+import (
+	"os"
+
+	"golang.org/x/sys/windows/registry"
+)
 
 // Get gets the current wallpaper.
 func Get() (wallpaper string, err error) {

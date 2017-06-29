@@ -2,14 +2,17 @@
 
 package wallpaper
 
-import "bufio"
-import "github.com/go-ini/ini"
-import "io/ioutil"
-import "os"
-import "os/user"
-import "path/filepath"
-import "regexp"
-import "strings"
+import (
+	"bufio"
+	"io/ioutil"
+	"os"
+	"os/user"
+	"path/filepath"
+	"regexp"
+	"strings"
+
+	"github.com/go-ini/ini"
+)
 
 func parseLXDEConfig() (wallpaper string, err error) {
 	usr, err := user.Current()

@@ -2,11 +2,13 @@
 
 package wallpaper
 
-import "os/exec"
-import "os/user"
-import "path/filepath"
-import "strconv"
-import "strings"
+import (
+	"os/exec"
+	"os/user"
+	"path/filepath"
+	"strconv"
+	"strings"
+)
 
 // Get gets the current wallpaper.
 func Get() (string, error) {

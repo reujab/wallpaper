@@ -1,10 +1,12 @@
 package wallpaper
 
-import "errors"
-import "io"
-import "net/http"
-import "os"
-import "path/filepath"
+import (
+	"errors"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+)
 
 // Desktop contains the current desktop environment on Linux.
 // Empty string on all other operating systems.
