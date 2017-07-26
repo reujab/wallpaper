@@ -13,19 +13,22 @@ go get github.com/reujab/wallpaper
 ```go
 package main
 
-import "fmt"
-import "github.com/reujab/wallpaper"
+import (
+	"fmt"
+
+	"github.com/reujab/wallpaper"
+)
 
 func main() {
-  background, err := wallpaper.Get()
+	background, err := wallpaper.Get()
 
-  if err != nil {
-    panic(err)
-  }
+	if err != nil {
+		panic(err)
+	}
 
-  fmt.Println("Current wallpaper:", background)
-  wallpaper.SetFromFile("/usr/share/backgrounds/gnome/adwaita-day.jpg")
-  wallpaper.SetFromURL("https://i.imgur.com/pIwrYeM.jpg")
+	fmt.Println("Current wallpaper:", background)
+	wallpaper.SetFromFile("/usr/share/backgrounds/gnome/adwaita-day.jpg")
+	wallpaper.SetFromURL("https://i.imgur.com/pIwrYeM.jpg")
 }
 ```
 
