@@ -15,42 +15,47 @@ var Desktop = os.Getenv("XDG_CURRENT_DESKTOP")
 // ErrUnsupportedDE is thrown when Desktop is not a supported desktop environment.
 var ErrUnsupportedDE = errors.New("your desktop environment is not supported")
 
-func downloadImage(url string) (filename string, err error) {
+func downloadImage(url string) (string, error) {
 	cacheDir, err := getCacheDir()
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	filename = filepath.Join(cacheDir, filepath.Base(url))
-
+	filename := filepath.Join(cacheDir, filepath.Base(url))
 	file, err := os.Create(filename)
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	defer func() {
-		err = file.Close()
-	}()
+	defer file.Close()
 
 	res, err := http.Get(url)
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	defer func() {
-		err = res.
-			Body.
-			Close()
-	}()
+	defer res.Body.Close()
 
 	_, err = io.Copy(file, res.Body)
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	return
+	err = file.Close()
+
+	if err != nil {
+		return "", err
+	}
+
+	err = res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+
+	return filename, nil
 }

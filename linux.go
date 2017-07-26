@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Get gets the current wallpaper.
+// Get returns the current wallpaper.
 func Get() (string, error) {
 	switch Desktop {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
@@ -22,9 +22,7 @@ func Get() (string, error) {
 	case "MATE":
 		return parseOutput("dconf", "read", "/org/mate/desktop/background/picture-filename")
 	case "XFCE":
-		output, err := exec.
-			Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image").
-			Output()
+		output, err := exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image").Output()
 
 		if err != nil {
 			return "", err
@@ -44,31 +42,19 @@ func Get() (string, error) {
 func SetFromFile(file string) error {
 	switch Desktop {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
-		return exec.
-			Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).
-			Run()
+		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "KDE":
 		return writeKDEConfig(file)
 	case "X-Cinnamon":
-		return exec.
-			Command("dconf", "write", "/org/cinnamon/desktop/background/picture-uri", strconv.Quote("file://"+file)).
-			Run()
+		return exec.Command("dconf", "write", "/org/cinnamon/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "MATE":
-		return exec.
-			Command("dconf", "write", "/org/mate/desktop/background/picture-filename", strconv.Quote(file)).
-			Run()
+		return exec.Command("dconf", "write", "/org/mate/desktop/background/picture-filename", strconv.Quote(file)).Run()
 	case "XFCE":
-		return exec.
-			Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image", "-s", file).
-			Run()
+		return exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image", "-s", file).Run()
 	case "LXDE":
-		return exec.
-			Command("pcmanfm", "-w", file).
-			Run()
+		return exec.Command("pcmanfm", "-w", file).Run()
 	case "Deepin":
-		return exec.
-			Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).
-			Run()
+		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	default:
 		return ErrUnsupportedDE
 	}
@@ -80,18 +66,16 @@ func SetFromFile(file string) error {
 // In other desktops, it downloads the image and calls SetFromFile.
 func SetFromURL(url string) error {
 	if Desktop == "GNOME" {
-		return exec.
-			Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote(url)).
-			Run()
+		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote(url)).Run()
 	}
 
-	file, err := downloadImage(url)
+	filename, err := downloadImage(url)
 
 	if err != nil {
 		return err
 	}
 
-	return SetFromFile(file)
+	return SetFromFile(filename)
 }
 
 func getCacheDir() (string, error) {
@@ -121,9 +105,7 @@ func removeProtocol(output string) string {
 }
 
 func parseOutput(command string, args ...string) (string, error) {
-	output, err := exec.
-		Command(command, args...).
-		Output()
+	output, err := exec.Command(command, args...).Output()
 
 	if err != nil {
 		return "", err

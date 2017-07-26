@@ -4,6 +4,7 @@ package wallpaper
 
 import (
 	"bufio"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -14,99 +15,82 @@ import (
 	"github.com/go-ini/ini"
 )
 
-func parseLXDEConfig() (wallpaper string, err error) {
+func parseLXDEConfig() (string, error) {
 	usr, err := user.Current()
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	lxdeConfig, err := ioutil.ReadFile(filepath.Join(usr.HomeDir, ".config", "pcmanfm", "LXDE", "desktop-items-0.conf"))
+	cfg, err := ini.Load(filepath.Join(usr.HomeDir, ".config/pcmanfm/LXDE/desktop-items-0.conf"))
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	cfg, err := ini.Load(lxdeConfig)
+	key, err := cfg.Section("*").GetKey("wallpaper")
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	key, err := cfg.
-		Section("*").
-		GetKey("wallpaper")
-
-	if err != nil {
-		return
-	}
-
-	wallpaper = key.String()
-
-	return
+	return key.String(), err
 }
 
-func parseKDEConfig() (wallpaper string, err error) {
-	kdeConfig, err := getKDEConfigFile()
+func parseKDEConfig() (string, error) {
+	filename, err := getKDEConfigFile()
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	file, err := os.Open(kdeConfig)
+	file, err := os.Open(filename)
 
 	if err != nil {
-		return
+		return "", err
 	}
 
-	defer func() {
-		err = file.Close()
-	}()
+	defer file.Close()
 
-	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(file)
 
-	for {
-		var line string
-
-		line, err = reader.ReadString('\n')
-
-		if err != nil {
-			return
-		}
+	for scanner.Scan() {
+		line := scanner.Text()
 
 		if len(line) >= 6 && line[:6] == "Image=" {
-			wallpaper = strings.TrimSpace(removeProtocol(line[6:]))
-
-			return
+			return strings.TrimSpace(removeProtocol(line[6:])), nil
 		}
 	}
+
+	err = scanner.Err()
+
+	if err != nil {
+		return "", err
+	}
+
+	err = file.Close()
+
+	if err != nil {
+		return "", err
+	}
+
+	return "", errors.New("kde image not found")
 }
 
-func writeKDEConfig(filename string) (err error) {
-	// is there a more efficient way of doing this that doesn't require loading the
-	// whole file into memory?
-
-	kdeConfig, err := getKDEConfigFile()
+func writeKDEConfig(wallpaper string) error {
+	filename, err := getKDEConfigFile()
 
 	if err != nil {
-		return
+		return err
 	}
 
-	config, err := ioutil.ReadFile(kdeConfig)
+	config, err := ioutil.ReadFile(filename)
 
 	if err != nil {
-		return
+		return err
 	}
 
-	regex := regexp.MustCompile(`(?m)^Image=.*`)
-
-	err = ioutil.WriteFile(kdeConfig, regex.ReplaceAll(config, []byte("Image="+filename)), 0666)
-
-	if err != nil {
-		return
-	}
-
-	return
+	return ioutil.WriteFile(filename, regexp.MustCompile(`(?m)^Image=.*`).ReplaceAll(config, []byte("Image="+wallpaper)), 0666)
 }
 
 func getKDEConfigFile() (string, error) {
