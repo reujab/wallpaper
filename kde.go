@@ -5,16 +5,21 @@ package wallpaper
 import (
 	"bufio"
 	"errors"
-	"io/ioutil"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
-	"regexp"
+	"strconv"
 	"strings"
 )
 
 func parseKDEConfig() (string, error) {
-	filename, err := getKDEConfigFile()
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+
+	filename := filepath.Join(usr.HomeDir, ".config", "plasma-org.kde.plasma.desktop-appletsrc")
 	if err != nil {
 		return "", err
 	}
@@ -44,24 +49,12 @@ func parseKDEConfig() (string, error) {
 	return "", errors.New("kde image not found")
 }
 
-func writeKDEConfig(wallpaper string) error {
-	filename, err := getKDEConfigFile()
-	if err != nil {
-		return err
-	}
-
-	file, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-
-	return ioutil.WriteFile(filename, regexp.MustCompile(`(?m)^Image=.*`).ReplaceAll(file, []byte("Image="+wallpaper)), 0666)
-}
-
-func getKDEConfigFile() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(usr.HomeDir, ".config", "plasma-org.kde.plasma.desktop-appletsrc"), nil
+func setKDEBackground(uri string) error {
+	return exec.Command("qdbus", "org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell.evaluateScript", `
+		const monitors = desktops()
+		for (var i = 0; i < monitors.length; i++) {
+			monitors[i].currentConfigGroup = ["Wallpaper"]
+			monitors[i].writeConfig("Image", `+strconv.Quote(uri)+`)
+		}
+	`).Run()
 }

@@ -44,7 +44,7 @@ func SetFromFile(file string) error {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
 		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "KDE":
-		return writeKDEConfig(file)
+		return setKDEBackground("file://" + file)
 	case "X-Cinnamon":
 		return exec.Command("dconf", "write", "/org/cinnamon/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "MATE":
