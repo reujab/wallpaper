@@ -13,7 +13,6 @@ import (
 // Get returns the path to the current wallpaper.
 func Get() (string, error) {
 	stdout, err := exec.Command("osascript", "-e", `tell application "Finder" to get POSIX path of (get desktop picture as alias)`).Output()
-
 	if err != nil {
 		return "", err
 	}
@@ -30,7 +29,6 @@ func SetFromFile(file string) error {
 // SetFromURL downloads `url` and calls SetFromFile.
 func SetFromURL(url string) error {
 	file, err := downloadImage(url)
-
 	if err != nil {
 		return err
 	}
@@ -40,7 +38,6 @@ func SetFromURL(url string) error {
 
 func getCacheDir() (string, error) {
 	usr, err := user.Current()
-
 	if err != nil {
 		return "", err
 	}

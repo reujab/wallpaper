@@ -17,42 +17,32 @@ var ErrUnsupportedDE = errors.New("your desktop environment is not supported")
 
 func downloadImage(url string) (string, error) {
 	cacheDir, err := getCacheDir()
-
 	if err != nil {
 		return "", err
 	}
 
 	filename := filepath.Join(cacheDir, filepath.Base(url))
 	file, err := os.Create(filename)
-
 	if err != nil {
 		return "", err
 	}
-
 	defer file.Close()
 
 	res, err := http.Get(url)
-
 	if err != nil {
 		return "", err
 	}
-
 	defer res.Body.Close()
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return "", errors.New("non-200 status code")
+	}
 
 	_, err = io.Copy(file, res.Body)
-
 	if err != nil {
 		return "", err
 	}
 
 	err = file.Close()
-
-	if err != nil {
-		return "", err
-	}
-
-	err = res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}

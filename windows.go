@@ -11,27 +11,17 @@ import (
 // Get returns the current wallpaper.
 func Get() (string, error) {
 	key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.READ)
-
 	if err != nil {
 		return "", err
 	}
-
 	defer key.Close()
 
 	wallpaper, _, err := key.GetStringValue("Wallpaper")
-
 	if err != nil {
 		return "", err
 	}
 
 	err = key.Close()
-
-	if err != nil {
-		return "", err
-	}
-
-	err = key.Close()
-
 	if err != nil {
 		return "", err
 	}
@@ -44,15 +34,12 @@ func Get() (string, error) {
 // Note: this requires you to log out and in again.
 func SetFromFile(file string) error {
 	key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.WRITE)
-
 	if err != nil {
 		return err
 	}
-
 	defer key.Close()
 
 	err = key.SetStringValue("Wallpaper", file)
-
 	if err != nil {
 		return err
 	}
@@ -70,7 +57,6 @@ func SetFromFile(file string) error {
 // SetFromURL downloads url and calls SetFromFile.
 func SetFromURL(url string) error {
 	file, err := downloadImage(url)
-
 	if err != nil {
 		return err
 	}

@@ -25,11 +25,9 @@ func Get() (string, error) {
 		return parseDconf("dconf", "read", "/org/mate/desktop/background/picture-filename")
 	case "XFCE":
 		output, err := exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image").Output()
-
 		if err != nil {
 			return "", err
 		}
-
 		return strings.TrimSpace(string(output)), nil
 	case "LXDE":
 		return parseLXDEConfig()
@@ -72,21 +70,17 @@ func SetFromURL(url string) error {
 	}
 
 	filename, err := downloadImage(url)
-
 	if err != nil {
 		return err
 	}
-
 	return SetFromFile(filename)
 }
 
 func getCacheDir() (string, error) {
 	usr, err := user.Current()
-
 	if err != nil {
 		return "", err
 	}
-
 	return filepath.Join(usr.HomeDir, ".cache"), nil
 }
 
@@ -108,7 +102,6 @@ func removeProtocol(output string) string {
 
 func parseDconf(command string, args ...string) (string, error) {
 	output, err := exec.Command(command, args...).Output()
-
 	if err != nil {
 		return "", err
 	}
@@ -118,22 +111,18 @@ func parseDconf(command string, args ...string) (string, error) {
 
 func parseLXDEConfig() (string, error) {
 	usr, err := user.Current()
-
 	if err != nil {
 		return "", err
 	}
 
 	cfg, err := ini.Load(filepath.Join(usr.HomeDir, ".config/pcmanfm/LXDE/desktop-items-0.conf"))
-
 	if err != nil {
 		return "", err
 	}
 
 	key, err := cfg.Section("*").GetKey("wallpaper")
-
 	if err != nil {
 		return "", err
 	}
-
 	return key.String(), err
 }
