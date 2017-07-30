@@ -14,13 +14,13 @@ import (
 func Get() (string, error) {
 	switch Desktop {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
-		return parseOutput("dconf", "read", "/org/gnome/desktop/background/picture-uri")
+		return parseDconf("dconf", "read", "/org/gnome/desktop/background/picture-uri")
 	case "KDE":
 		return parseKDEConfig()
 	case "X-Cinnamon":
-		return parseOutput("dconf", "read", "/org/cinnamon/desktop/background/picture-uri")
+		return parseDconf("dconf", "read", "/org/cinnamon/desktop/background/picture-uri")
 	case "MATE":
-		return parseOutput("dconf", "read", "/org/mate/desktop/background/picture-filename")
+		return parseDconf("dconf", "read", "/org/mate/desktop/background/picture-filename")
 	case "XFCE":
 		output, err := exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image").Output()
 
@@ -32,7 +32,7 @@ func Get() (string, error) {
 	case "LXDE":
 		return parseLXDEConfig()
 	case "Deepin":
-		return parseOutput("dconf", "read", "/com/deepin/wrap/gnome/desktop/background/picture-uri")
+		return parseDconf("dconf", "read", "/com/deepin/wrap/gnome/desktop/background/picture-uri")
 	default:
 		return "", ErrUnsupportedDE
 	}
@@ -104,7 +104,7 @@ func removeProtocol(output string) string {
 	return output
 }
 
-func parseOutput(command string, args ...string) (string, error) {
+func parseDconf(command string, args ...string) (string, error) {
 	output, err := exec.Command(command, args...).Output()
 
 	if err != nil {
