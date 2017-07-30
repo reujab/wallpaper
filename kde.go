@@ -1,4 +1,4 @@
-// +build linux
+//+build linux
 
 package wallpaper
 
@@ -11,31 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/go-ini/ini"
 )
-
-func parseLXDEConfig() (string, error) {
-	usr, err := user.Current()
-
-	if err != nil {
-		return "", err
-	}
-
-	cfg, err := ini.Load(filepath.Join(usr.HomeDir, ".config/pcmanfm/LXDE/desktop-items-0.conf"))
-
-	if err != nil {
-		return "", err
-	}
-
-	key, err := cfg.Section("*").GetKey("wallpaper")
-
-	if err != nil {
-		return "", err
-	}
-
-	return key.String(), err
-}
 
 func parseKDEConfig() (string, error) {
 	filename, err := getKDEConfigFile()
