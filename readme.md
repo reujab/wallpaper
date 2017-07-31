@@ -34,5 +34,4 @@ func main() {
 
 ## Notes
 
-* On Windows, you must log out and in again for the background to update.
 * Enlightenment is not supported.

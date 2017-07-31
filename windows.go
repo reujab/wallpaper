@@ -4,8 +4,26 @@ package wallpaper
 
 import (
 	"os"
+	"syscall"
+	"unsafe"
 
 	"golang.org/x/sys/windows/registry"
+)
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947.aspx
+const (
+	spiSetDeskWallpaper = 0x0014
+
+	uiParam = 0x0000
+
+	spifUpdateINIFile = 0x01
+	spifSendChange    = 0x02
+)
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724947.aspx
+var (
+	user32               = syscall.NewLazyDLL("user32.dll")
+	systemParametersInfo = user32.NewProc("SystemParametersInfoW")
 )
 
 // Get returns the current wallpaper.
@@ -29,29 +47,15 @@ func Get() (string, error) {
 	return wallpaper, nil
 }
 
-// SetFromFile sets the wallpaper for the current user to specified file by setting HKEY_CURRENT_USER\Control Panel\Desktop\Wallpaper.
-//
-// Note: this requires you to log out and in again.
-func SetFromFile(file string) error {
-	key, err := registry.OpenKey(registry.CURRENT_USER, `Control Panel\Desktop`, registry.WRITE)
-	if err != nil {
-		return err
-	}
-	defer key.Close()
-
-	err = key.SetStringValue("Wallpaper", file)
-	if err != nil {
-		return err
-	}
-
-	// this is supposed to update the wallpaper, but i only got a black background
-	// err = exec.Command("rundll32", "user32.dll,UpdatePerUserSystemParameters").Run()
-	//
-	// if err != nil {
-	//   return
-	// }
-
-	return key.Close()
+// SetFromFile sets the wallpaper for the current user.
+func SetFromFile(filename string) error {
+	systemParametersInfo.Call(
+		uintptr(spiSetDeskWallpaper),
+		uintptr(uiParam),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(filename))),
+		uintptr(spifUpdateINIFile|spifSendChange),
+	)
+	return nil
 }
 
 // SetFromURL downloads url and calls SetFromFile.
