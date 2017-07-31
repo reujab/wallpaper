@@ -49,10 +49,15 @@ func Get() (string, error) {
 
 // SetFromFile sets the wallpaper for the current user.
 func SetFromFile(filename string) error {
+	filenameUTF16, err := syscall.UTF16PtrFromString(filename)
+	if err != nil {
+		return err
+	}
+
 	systemParametersInfo.Call(
 		uintptr(spiSetDeskWallpaper),
 		uintptr(uiParam),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(filename))),
+		uintptr(unsafe.Pointer(filenameUTF16)),
 		uintptr(spifUpdateINIFile|spifSendChange),
 	)
 	return nil
