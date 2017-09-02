@@ -1,4 +1,4 @@
-# wallpaper [![Documentation](https://godoc.org/github.com/reujab/wallpaper?status.svg)](https://godoc.org/github.com/reujab/wallpaper)
+# wallpaper [![godoc](https://godoc.org/github.com/reujab/wallpaper?status.svg)](https://godoc.org/github.com/reujab/wallpaper)
 
 A cross-platform (Linux, Windows, and macOS) Golang library for getting and setting the desktop background.
 
