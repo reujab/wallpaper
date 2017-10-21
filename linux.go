@@ -9,9 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	ini "gopkg.in/ini.v1"
 	yaml "gopkg.in/yaml.v2"
-
-	"github.com/go-ini/ini"
 )
 
 // Get returns the current wallpaper.
