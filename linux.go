@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/go-ini/ini"
 )
 
@@ -88,20 +90,11 @@ func getCacheDir() (string, error) {
 	return filepath.Join(usr.HomeDir, ".cache"), nil
 }
 
-func unquote(quoted string) string {
-	if len(quoted) >= 2 && quoted[0] == '\'' && quoted[len(quoted)-2] == '\'' {
-		return quoted[1 : len(quoted)-2]
+func removeProtocol(input string) string {
+	if len(input) >= 7 && input[:7] == "file://" {
+		return input[7:]
 	}
-
-	return quoted
-}
-
-func removeProtocol(output string) string {
-	if len(output) >= 7 && output[:7] == "file://" {
-		return output[7:]
-	}
-
-	return output
+	return input
 }
 
 func parseDconf(command string, args ...string) (string, error) {
@@ -110,7 +103,15 @@ func parseDconf(command string, args ...string) (string, error) {
 		return "", err
 	}
 
-	return removeProtocol(unquote(string(output))), nil
+	// unquote string
+	var unquoted string
+	// the output is quoted with single quotes, which cannot be unquoted using strconv.Unquote, but it is valid yaml
+	err = yaml.UnmarshalStrict(output, &unquoted)
+	if err != nil {
+		return unquoted, err
+	}
+
+	return unquoted, nil
 }
 
 func parseLXDEConfig() (string, error) {
