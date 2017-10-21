@@ -111,7 +111,7 @@ func parseDconf(command string, args ...string) (string, error) {
 		return unquoted, err
 	}
 
-	return unquoted, nil
+	return removeProtocol(unquoted), nil
 }
 
 func parseLXDEConfig() (string, error) {
