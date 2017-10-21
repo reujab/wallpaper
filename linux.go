@@ -17,9 +17,7 @@ import (
 // Get returns the current wallpaper.
 func Get() (string, error) {
 	switch Desktop {
-	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
-		return parseDconf("dconf", "read", "/org/gnome/desktop/background/picture-uri")
-	case "ubuntu:GNOME":
+	case "ubuntu:GNOME", "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
 		return parseDconf("gsettings", "get", "org.gnome.desktop.background", "picture-uri")
 	case "KDE":
 		return parseKDEConfig()
@@ -45,9 +43,7 @@ func Get() (string, error) {
 // SetFromFile sets wallpaper from a file path.
 func SetFromFile(file string) error {
 	switch Desktop {
-	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
-		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
-	case "ubuntu:GNOME":
+	case "ubuntu:GNOME", "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
 		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
 	case "KDE":
 		return setKDEBackground("file://" + file)
@@ -72,7 +68,7 @@ func SetFromFile(file string) error {
 // In other desktops, it downloads the image and calls SetFromFile.
 func SetFromURL(url string) error {
 	if Desktop == "GNOME" {
-		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote(url)).Run()
+		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote(url)).Run()
 	}
 
 	filename, err := downloadImage(url)
