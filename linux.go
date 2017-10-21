@@ -17,6 +17,8 @@ func Get() (string, error) {
 	switch Desktop {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
 		return parseDconf("dconf", "read", "/org/gnome/desktop/background/picture-uri")
+	case "ubuntu:GNOME":
+		return parseDconf("gsettings", "get", "org.gnome.desktop.background", "picture-uri")
 	case "KDE":
 		return parseKDEConfig()
 	case "X-Cinnamon":
@@ -43,6 +45,8 @@ func SetFromFile(file string) error {
 	switch Desktop {
 	case "GNOME", "Unity", "Pantheon", "Budgie:GNOME":
 		return exec.Command("dconf", "write", "/org/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
+	case "ubuntu:GNOME":
+		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
 	case "KDE":
 		return setKDEBackground("file://" + file)
 	case "X-Cinnamon":
