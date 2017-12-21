@@ -60,6 +60,8 @@ func SetFromFile(file string) error {
 		return exec.Command("pcmanfm", "-w", file).Run()
 	case "Deepin":
 		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
+	case "i3":
+		return exec.Command("feh", "--bg-fill", file).Run()
 	default:
 		return ErrUnsupportedDE
 	}
@@ -70,16 +72,20 @@ func SetFromFile(file string) error {
 // In GNOME, it sets org.gnome.desktop.background.picture-uri to the URL.
 // In other desktops, it downloads the image and calls SetFromFile.
 func SetFromURL(url string) error {
+	switch Desktop {
 	// only some GNOME-based desktops support urls for picture-uri
-	if Desktop == "GNOME" || Desktop == "ubuntu:GNOME" {
+	case "GNOME", "ubuntu:GNOME":
 		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote(url)).Run()
+		//on i3 feh can also set the background from url
+	case "i3":
+		return exec.Command("feh", "--bg-fill", url).Run()
+	default:
+		filename, err := downloadImage(url)
+		if err != nil {
+			return err
+		}
+		return SetFromFile(filename)
 	}
-
-	filename, err := downloadImage(url)
-	if err != nil {
-		return err
-	}
-	return SetFromFile(filename)
 }
 
 func getCacheDir() (string, error) {
