@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	ini "gopkg.in/ini.v1"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/ini.v1"
+	"gopkg.in/yaml.v2"
 )
 
 // Get returns the current wallpaper.
@@ -126,7 +126,11 @@ func parseLXDEConfig() (string, error) {
 		return "", err
 	}
 
-	cfg, err := ini.Load(filepath.Join(usr.HomeDir, ".config/pcmanfm/LXDE/desktop-items-0.conf"))
+	if DesktopSession == "" {
+		DesktopSession = "LXDE"
+	}
+
+	cfg, err := ini.Load(filepath.Join(usr.HomeDir, ".config/pcmanfm/"+DesktopSession+"/desktop-items-0.conf"))
 	if err != nil {
 		return "", err
 	}
