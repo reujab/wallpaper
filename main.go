@@ -12,6 +12,8 @@ import (
 // Empty string on all other operating systems.
 var Desktop = os.Getenv("XDG_CURRENT_DESKTOP")
 
+var DesktopSession = os.Getenv("DESKTOP_SESSION")
+
 // ErrUnsupportedDE is thrown when Desktop is not a supported desktop environment.
 var ErrUnsupportedDE = errors.New("your desktop environment is not supported")
 
