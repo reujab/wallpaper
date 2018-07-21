@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/ini.v1"
-	"gopkg.in/yaml.v2"
+	ini "gopkg.in/ini.v1"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Get returns the current wallpaper.
@@ -76,7 +76,6 @@ func SetFromURL(url string) error {
 	// only some GNOME-based desktops support urls for picture-uri
 	case "GNOME", "ubuntu:GNOME":
 		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote(url)).Run()
-		//on i3 feh can also set the background from url
 	case "i3":
 		return exec.Command("feh", "--bg-fill", url).Run()
 	default:
