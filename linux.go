@@ -34,13 +34,14 @@ func init() {
 			continue
 		}
 
-		// checks to see if process's binary is named `i3`
+		// checks to see if process's binary is a recognized window manager
 		bin, err := os.Readlink("/proc/" + file.Name() + "/exe")
 		if err != nil {
 			continue
 		}
 
-		if path.Base(bin) == "i3" {
+		switch path.Base(bin) {
+		case "i3":
 			Desktop = "i3"
 			return
 		}
