@@ -3,8 +3,11 @@
 package wallpaper
 
 import (
+	"io/ioutil"
+	"os"
 	"os/exec"
 	"os/user"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -12,6 +15,37 @@ import (
 	ini "gopkg.in/ini.v1"
 	yaml "gopkg.in/yaml.v2"
 )
+
+// init guesses the current desktop by reading processes if $XDG_CURRENT_DESKTOP was not set.
+func init() {
+	if Desktop != "" {
+		return
+	}
+
+	files, err := ioutil.ReadDir("/proc")
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		// continue if not pid
+		_, err := strconv.ParseUint(file.Name(), 10, 64)
+		if err != nil {
+			continue
+		}
+
+		// checks to see if process's binary is named `i3`
+		bin, err := os.Readlink("/proc/" + file.Name() + "/exe")
+		if err != nil {
+			continue
+		}
+
+		if path.Base(bin) == "i3" {
+			Desktop = "i3"
+			return
+		}
+	}
+}
 
 // Get returns the current wallpaper.
 func Get() (string, error) {
