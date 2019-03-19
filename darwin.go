@@ -23,7 +23,7 @@ func Get() (string, error) {
 
 // SetFromFile uses AppleScript to tell Finder to set the desktop wallpaper to specified file.
 func SetFromFile(file string) error {
-	return exec.Command("osascript", "-e", `tell application "Finder" to set desktop picture to POSIX file `+strconv.Quote(file)).Run()
+	return exec.Command("osascript", "-e", `tell application "System Events" to tell every desktop to set picture to `+strconv.Quote(file)).Run()
 }
 
 // SetFromURL downloads `url` and calls SetFromFile.
