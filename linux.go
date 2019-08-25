@@ -46,7 +46,6 @@ func SetFromFile(file string) error {
 	if isGNOMECompliant() {
 		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
 	}
-
 	switch Desktop {
 	case "KDE":
 		return setKDEBackground("file://" + file)
@@ -63,7 +62,7 @@ func SetFromFile(file string) error {
 	case "i3":
 		return exec.Command("feh", "--bg-fill", file).Run()
 	case "sway":
-		return exec.Command("swaymsg ", `'output "*" background `+file+` fill'`).Run()
+		return exec.Command("swaymsg", `output "*" background `+file+` fill`).Run()
 	default:
 		return ErrUnsupportedDE
 	}
