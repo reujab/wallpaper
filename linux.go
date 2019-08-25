@@ -62,6 +62,8 @@ func SetFromFile(file string) error {
 		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "i3":
 		return exec.Command("feh", "--bg-fill", file).Run()
+	case "sway":
+		return exec.Command("swaymsg ", `'output "*" background `+file+` fill'`).Run()
 	default:
 		return ErrUnsupportedDE
 	}
