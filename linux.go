@@ -62,7 +62,12 @@ func Get() (string, error) {
 	case "MATE":
 		return parseDconf("dconf", "read", "/org/mate/desktop/background/picture-filename")
 	case "XFCE":
-		output, err := exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image").Output()
+		desktops, err := getXFCEDesktops()
+		if err != nil || len(desktops) == 0 {
+			return "", err
+		}
+
+		output, err := exec.Command("xfconf-query", "--channel", "xfce4-desktop", "--property", desktops[0]).Output()
 		if err != nil {
 			return "", err
 		}
@@ -90,7 +95,17 @@ func SetFromFile(file string) error {
 	case "MATE":
 		return exec.Command("dconf", "write", "/org/mate/desktop/background/picture-filename", strconv.Quote(file)).Run()
 	case "XFCE":
-		return exec.Command("xfconf-query", "-c", "xfce4-desktop", "-p", "/backdrop/screen0/monitor0/workspace0/last-image", "-s", file).Run()
+		desktops, err := getXFCEDesktops()
+		if err != nil {
+			return err
+		}
+		for _, desktop := range desktops {
+			err := exec.Command("xfconf-query", "--channel", "xfce4-desktop", "--property", desktop, "--set", file).Run()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	case "LXDE":
 		return exec.Command("pcmanfm", "-w", file).Run()
 	case "Deepin":
@@ -175,4 +190,24 @@ func parseLXDEConfig() (string, error) {
 
 func isGNOMECompliant() bool {
 	return strings.Contains(Desktop, "GNOME") || Desktop == "Unity" || Desktop == "Pantheon"
+}
+
+func getXFCEDesktops() ([]string, error) {
+	output, err := exec.Command("xfconf-query", "--channel", "xfce4-desktop", "--list").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(strings.Trim(string(output), "\n"), "\n")
+
+	i := 0
+	for _, line := range lines {
+		if path.Base(line) == "last-image" {
+			lines[i] = line
+			i++
+		}
+	}
+	lines = lines[:i]
+
+	return lines, nil
 }
