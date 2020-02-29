@@ -110,10 +110,13 @@ func SetFromFile(file string) error {
 		return exec.Command("pcmanfm", "-w", file).Run()
 	case "Deepin":
 		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
-	case "i3":
-		return exec.Command("feh", "--bg-fill", file).Run()
 	default:
-		return ErrUnsupportedDE
+		feh, err := exec.LookPath("feh")
+		if err != nil {
+			return ErrUnsupportedDE
+		}
+
+		return exec.Command(feh, "--bg-fill", file).Run()
 	}
 }
 
