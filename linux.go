@@ -84,7 +84,7 @@ func Get() (string, error) {
 // SetFromFile sets wallpaper from a file path.
 func SetFromFile(file string) error {
 	if isGNOMECompliant() {
-		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
+		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file), "&&", "gsettings", "set", "org.gnome.desktop.screensaver", "picture-uri", strconv.Quote("file://"+file)).Run()
 	}
 
 	switch Desktop {
