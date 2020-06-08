@@ -214,3 +214,8 @@ func getXFCEDesktops() ([]string, error) {
 
 	return lines, nil
 }
+
+// cleanFilename returns s with any illegal filename characters removed.
+func cleanFilename(s string) string {
+	return strings.ReplaceAll(s, "/", "")
+}

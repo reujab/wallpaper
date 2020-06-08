@@ -44,3 +44,8 @@ func getCacheDir() (string, error) {
 
 	return filepath.Join(usr.HomeDir, "Library", "Caches"), nil
 }
+
+// cleanFilename returns s with any illegal filename characters removed.
+func cleanFilename(s string) string {
+	return strings.ReplaceAll(s, "/", "")
+}
