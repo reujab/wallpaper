@@ -51,4 +51,3 @@ func downloadImage(url string) (string, error) {
 
 	return filename, nil
 }
-
