@@ -23,7 +23,7 @@ func downloadImage(url string) (string, error) {
 		return "", err
 	}
 
-	filename := filepath.Join(cacheDir, filepath.Base(url))
+	filename := filepath.Join(cacheDir, cleanFilename(filepath.Base(url)))
 	file, err := os.Create(filename)
 	if err != nil {
 		return "", err
