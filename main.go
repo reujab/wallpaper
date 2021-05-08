@@ -20,23 +20,6 @@ var DesktopSession = os.Getenv("DESKTOP_SESSION")
 var ErrUnsupportedDE = errors.New("your desktop environment is not supported")
 
 func downloadImage(url string) (string, error) {
-	cacheDir, err := getCacheDir()
-	if err != nil {
-		return "", err
-	}
-
-	wallpaperDir := filepath.Join(cacheDir, "wallpaper")
-	if err = recreateDir(wallpaperDir); err != nil {
-		return "", err
-	}
-
-	filename := filepath.Join(wallpaperDir, fmt.Sprint(time.Now()))
-	file, err := os.Create(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
 	res, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -44,6 +27,11 @@ func downloadImage(url string) (string, error) {
 	defer res.Body.Close()
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		return "", errors.New("non-200 status code")
+	}
+
+	file, err := prepareFile()
+	if err != nil {
+		return "", err
 	}
 
 	_, err = io.Copy(file, res.Body)
@@ -56,7 +44,26 @@ func downloadImage(url string) (string, error) {
 		return "", err
 	}
 
-	return filename, nil
+	return file.Name(), nil
+}
+
+func prepareFile() (*os.File, error) {
+	cacheDir, err := getCacheDir()
+	if err != nil {
+		return nil, err
+	}
+
+	wallpaperDir := filepath.Join(cacheDir, "wallpaper")
+	if err = recreateDir(wallpaperDir); err != nil {
+		return nil, err
+	}
+
+	filename := filepath.Join(wallpaperDir, fmt.Sprint(time.Now().UnixNano()))
+	file, err := os.Create(filename)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }
 
 func recreateDir(dirName string) error {
