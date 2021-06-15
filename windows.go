@@ -4,7 +4,6 @@ package wallpaper
 
 import (
 	"os"
-	"regexp"
 	"strings"
 	"syscall"
 	"unicode/utf16"
@@ -70,11 +69,4 @@ func SetFromURL(url string) error {
 
 func getCacheDir() (string, error) {
 	return os.TempDir(), nil
-}
-
-var illegalRe = regexp.MustCompile(`[<>:"/\\|?*]`)
-
-// cleanFilename returns s with any illegal filename characters removed.
-func cleanFilename(s string) string {
-	return illegalRe.ReplaceAllString(s, "")
 }
