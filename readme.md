@@ -32,6 +32,17 @@ func main() {
 }
 ```
 
-## Notes
+## Supported desktops
 
-* Enlightenment is not supported.
+* Windows
+* macOS
+* GNOME
+* KDE
+* Cinnamon
+* Unity
+* Budgie
+* XFCE
+* LXDE
+* MATE
+* Deepin
+* i3 (set only)
