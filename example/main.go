@@ -14,6 +14,14 @@ func main() {
 	}
 
 	fmt.Println("Current wallpaper:", background)
-	wallpaper.SetFromFile("/usr/share/backgrounds/gnome/adwaita-day.jpg")
-	wallpaper.SetFromURL("https://i.imgur.com/pIwrYeM.jpg")
+
+	err = wallpaper.SetFromFile("/usr/share/backgrounds/gnome/adwaita-day.jpg")
+	if err != nil {
+		panic(err)
+	}
+
+	err = wallpaper.SetFromURL("https://i.imgur.com/pIwrYeM.jpg")
+	if err != nil {
+		panic(err)
+	}
 }
