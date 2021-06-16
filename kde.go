@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func parseKDEConfig() (string, error) {
+func getKDE() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
 		return "", err
@@ -49,7 +49,7 @@ func parseKDEConfig() (string, error) {
 	return "", errors.New("kde image not found")
 }
 
-func setKDEBackground(uri string) error {
+func setKDE(uri string) error {
 	return exec.Command("qdbus", "org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell.evaluateScript", `
 		const monitors = desktops()
 		for (var i = 0; i < monitors.length; i++) {

@@ -2,18 +2,17 @@ package wallpaper
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // Desktop contains the current desktop environment on Linux.
 // Empty string on all other operating systems.
 var Desktop = os.Getenv("XDG_CURRENT_DESKTOP")
 
+// DesktopSession is used by LXDE on Linux.
 var DesktopSession = os.Getenv("DESKTOP_SESSION")
 
 // ErrUnsupportedDE is thrown when Desktop is not a supported desktop environment.
@@ -29,7 +28,12 @@ func downloadImage(url string) (string, error) {
 		return "", errors.New("non-200 status code")
 	}
 
-	file, err := prepareFile()
+	cacheDir, err := getCacheDir()
+	if err != nil {
+		return "", err
+	}
+
+	file, err := os.Create(filepath.Join(cacheDir, "wallpaper"))
 	if err != nil {
 		return "", err
 	}
@@ -47,40 +51,12 @@ func downloadImage(url string) (string, error) {
 	return file.Name(), nil
 }
 
-func prepareFile() (*os.File, error) {
-	cacheDir, err := getCacheDir()
+// SetFromURL downloads the image to a cache directory and calls SetFromFile.
+func SetFromURL(url string) error {
+	file, err := downloadImage(url)
 	if err != nil {
-		return nil, err
-	}
-
-	wallpaperDir := filepath.Join(cacheDir, "wallpaper")
-	if err = recreateDir(wallpaperDir); err != nil {
-		return nil, err
-	}
-
-	filename := filepath.Join(wallpaperDir, fmt.Sprint(time.Now().UnixNano()))
-	file, err := os.Create(filename)
-	if err != nil {
-		return nil, err
-	}
-	return file, nil
-}
-
-func recreateDir(dirName string) error {
-	if err := os.RemoveAll(dirName); err != nil {
 		return err
 	}
-	if err := ensureDir(dirName); err != nil {
-		return err
-	}
-	return nil
-}
 
-func ensureDir(dirName string) error {
-	err := os.MkdirAll(dirName, os.ModePerm)
-	if err == nil || os.IsExist(err) {
-		return nil
-	} else {
-		return err
-	}
+	return SetFromFile(file)
 }

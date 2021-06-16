@@ -26,16 +26,6 @@ func SetFromFile(file string) error {
 	return exec.Command("osascript", "-e", `tell application "System Events" to tell every desktop to set picture to `+strconv.Quote(file)).Run()
 }
 
-// SetFromURL downloads `url` and calls SetFromFile.
-func SetFromURL(url string) error {
-	file, err := downloadImage(url)
-	if err != nil {
-		return err
-	}
-
-	return SetFromFile(file)
-}
-
 func getCacheDir() (string, error) {
 	usr, err := user.Current()
 	if err != nil {

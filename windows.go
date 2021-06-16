@@ -57,16 +57,6 @@ func SetFromFile(filename string) error {
 	return nil
 }
 
-// SetFromURL downloads url and calls SetFromFile.
-func SetFromURL(url string) error {
-	file, err := downloadImage(url)
-	if err != nil {
-		return err
-	}
-
-	return SetFromFile(file)
-}
-
 func getCacheDir() (string, error) {
 	return os.TempDir(), nil
 }
