@@ -49,4 +49,5 @@ func main() {
 * LXDE
 * MATE
 * Deepin
-* i3 (set only)
+* Most Wayland compositors (set only, requires swaybg)
+* i3 (set only, requires feh)
