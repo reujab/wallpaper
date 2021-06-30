@@ -53,12 +53,13 @@ func SetFromFile(file string) error {
 	case "Deepin":
 		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	default:
-		feh, err := exec.LookPath("feh")
-		if err != nil {
-			return ErrUnsupportedDE
+		err := exec.Command("swaybg", "-i", file).Start()
+		// if the command completed successfully, return
+		if err == nil {
+			return nil
 		}
 
-		return exec.Command(feh, "--bg-fill", file).Run()
+		return exec.Command("feh", "-bg-fill", file).Run()
 	}
 }
 
