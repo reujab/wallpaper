@@ -21,22 +21,17 @@ import (
 
 func main() {
 	background, err := wallpaper.Get()
-
-	if err != nil {
-		panic(err)
-	}
-
+	check(err)
 	fmt.Println("Current wallpaper:", background)
 
 	err = wallpaper.SetFromFile("/usr/share/backgrounds/gnome/adwaita-day.jpg")
-	if err != nil {
-		panic(err)
-	}
+	check(err)
 
 	err = wallpaper.SetFromURL("https://i.imgur.com/pIwrYeM.jpg")
-	if err != nil {
-		panic(err)
-	}
+	check(err)
+
+	err = wallpaper.SetMode(wallpaper.Crop)
+	check(err)
 }
 
 ```
