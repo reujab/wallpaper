@@ -26,6 +26,11 @@ func SetFromFile(file string) error {
 	return exec.Command("osascript", "-e", `tell application "System Events" to tell every desktop to set picture to `+strconv.Quote(file)).Run()
 }
 
+// SetMode does nothing on macOS.
+func SetMode(mode Mode) error {
+	return nil
+}
+
 func getCacheDir() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
