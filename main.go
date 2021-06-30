@@ -8,6 +8,17 @@ import (
 	"path/filepath"
 )
 
+type Mode int
+
+const (
+	Center Mode = iota
+	Crop
+	Fit
+	Span
+	Stretch
+	Tile
+)
+
 // Desktop contains the current desktop environment on Linux.
 // Empty string on all other operating systems.
 var Desktop = os.Getenv("XDG_CURRENT_DESKTOP")

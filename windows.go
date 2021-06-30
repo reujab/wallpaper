@@ -3,6 +3,7 @@
 package wallpaper
 
 import (
+	"golang.org/x/sys/windows/registry"
 	"os"
 	"strings"
 	"syscall"
@@ -55,6 +56,54 @@ func SetFromFile(filename string) error {
 		uintptr(spifUpdateINIFile|spifSendChange),
 	)
 	return nil
+}
+
+// SetMode sets the wallpaper mode.
+func SetMode(mode Mode) error {
+	key, _, err := registry.CreateKey(registry.CURRENT_USER, "Control Panel\\Desktop", registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer key.Close()
+
+	var tile string
+	if mode == Tile {
+		tile = "1"
+	} else {
+		tile = "0"
+	}
+	err = key.SetStringValue("TileWallpaper", tile)
+	if err != nil {
+		return err
+	}
+
+	var style string
+	switch mode {
+	case Center, Tile:
+		style = "0"
+	case Fit:
+		style = "6"
+	case Span:
+		style = "22"
+	case Stretch:
+		style = "2"
+	case Crop:
+		style = "10"
+	default:
+		panic("invalid wallpaper mode")
+	}
+	err = key.SetStringValue("WallpaperStyle", style)
+	if err != nil {
+		return err
+	}
+
+	// updates wallpaper
+	path, err := Get()
+	if err != nil {
+		return err
+	}
+
+	return SetFromFile(path)
 }
 
 func getCacheDir() (string, error) {
