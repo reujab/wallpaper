@@ -7,9 +7,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"strconv"
-	"strings"
-
-	yaml "gopkg.in/yaml.v2"
 )
 
 // Get returns the current wallpaper.
@@ -44,7 +41,7 @@ func SetFromFile(file string) error {
 
 	switch Desktop {
 	case "KDE":
-		return setKDE("file://" + file)
+		return setKDE(file)
 	case "X-Cinnamon":
 		return exec.Command("dconf", "write", "/org/cinnamon/desktop/background/picture-uri", strconv.Quote("file://"+file)).Run()
 	case "MATE":
@@ -65,38 +62,34 @@ func SetFromFile(file string) error {
 	}
 }
 
+// SetMode sets the wallpaper mode.
+func SetMode(mode Mode) error {
+	if isGNOMECompliant() {
+		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-options", strconv.Quote(mode.getGNOMEString())).Run()
+	}
+
+	switch Desktop {
+	case "KDE":
+		return setKDEMode(mode)
+	case "X-Cinnamon":
+		return exec.Command("dconf", "write", "/org/cinnamon/desktop/background/picture-options", strconv.Quote(mode.getGNOMEString())).Run()
+	case "MATE":
+		return exec.Command("dconf", "write", "/org/mate/desktop/background/picture-options", strconv.Quote(mode.getGNOMEString())).Run()
+	case "XFCE":
+		return setXFCEMode(mode)
+	case "LXDE":
+		return exec.Command("pcmanfm", "--wallpaper-mode", mode.getLXDEString()).Run()
+	case "Deepin":
+		return exec.Command("dconf", "write", "/com/deepin/wrap/gnome/desktop/background/picture-options", strconv.Quote(mode.getGNOMEString())).Run()
+	default:
+		return ErrUnsupportedDE
+	}
+}
+
 func getCacheDir() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
 		return "", err
 	}
 	return filepath.Join(usr.HomeDir, ".cache"), nil
-}
-
-func removeProtocol(input string) string {
-	if len(input) >= 7 && input[:7] == "file://" {
-		return input[7:]
-	}
-	return input
-}
-
-func parseDconf(command string, args ...string) (string, error) {
-	output, err := exec.Command(command, args...).Output()
-	if err != nil {
-		return "", err
-	}
-
-	// unquote string
-	var unquoted string
-	// the output is quoted with single quotes, which cannot be unquoted using strconv.Unquote, but it is valid yaml
-	err = yaml.UnmarshalStrict(output, &unquoted)
-	if err != nil {
-		return unquoted, err
-	}
-
-	return removeProtocol(unquoted), nil
-}
-
-func isGNOMECompliant() bool {
-	return strings.Contains(Desktop, "GNOME") || Desktop == "Unity" || Desktop == "Pantheon"
 }

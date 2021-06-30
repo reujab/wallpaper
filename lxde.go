@@ -28,3 +28,22 @@ func getLXDE() (string, error) {
 	}
 	return key.String(), err
 }
+
+func (mode Mode) getLXDEString() string {
+	switch mode {
+	case Center:
+		return "center"
+	case Crop:
+		return "crop"
+	case Fit:
+		return "fit"
+	case Span:
+		return "screen"
+	case Stretch:
+		return "stretch"
+	case Tile:
+		return "tile"
+	default:
+		panic("invalid wallpaper mode")
+	}
+}

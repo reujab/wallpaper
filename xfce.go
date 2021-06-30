@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getXFCEDesktops() ([]string, error) {
+func getXFCEProps(key string) ([]string, error) {
 	output, err := exec.Command("xfconf-query", "--channel", "xfce4-desktop", "--list").Output()
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func getXFCEDesktops() ([]string, error) {
 	var desktops []string
 
 	for _, line := range lines {
-		if path.Base(line) == "last-image" {
+		if path.Base(line) == key {
 			desktops = append(desktops, line)
 		}
 	}
@@ -25,7 +25,7 @@ func getXFCEDesktops() ([]string, error) {
 }
 
 func getXFCE() (string, error) {
-	desktops, err := getXFCEDesktops()
+	desktops, err := getXFCEProps("last-image")
 	if err != nil || len(desktops) == 0 {
 		return "", err
 	}
@@ -38,7 +38,7 @@ func getXFCE() (string, error) {
 }
 
 func setXFCE(file string) error {
-	desktops, err := getXFCEDesktops()
+	desktops, err := getXFCEProps("last-image")
 	if err != nil {
 		return err
 	}
@@ -49,4 +49,39 @@ func setXFCE(file string) error {
 		}
 	}
 	return nil
+}
+
+func setXFCEMode(mode Mode) error {
+	styles, err := getXFCEProps("image-style")
+	if err != nil {
+		return err
+	}
+
+	for _, style := range styles {
+		err = exec.Command("xfconf-query", "--channel", "xfce4-desktop", "--property", style, "--set", mode.getXFCEString()).Run()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (mode Mode) getXFCEString() string {
+	switch mode {
+	case Center:
+		return "1"
+	case Crop:
+		return "5"
+	case Fit:
+		return "4"
+	case Span:
+		return "5"
+	case Stretch:
+		return "3"
+	case Tile:
+		return "2"
+	default:
+		panic("invalid wallpaper mode")
+	}
 }
