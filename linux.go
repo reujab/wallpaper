@@ -59,7 +59,7 @@ func SetFromFile(file string) error {
 			return nil
 		}
 
-		return exec.Command("feh", "-bg-fill", file).Run()
+		return exec.Command("feh", "--bg-fill", file).Run()
 	}
 }
 
