@@ -36,7 +36,16 @@ func Get() (string, error) {
 // SetFromFile sets wallpaper from a file path.
 func SetFromFile(file string) error {
 	if isGNOMECompliant() {
-		return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
+		err := exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri", strconv.Quote("file://"+file)).Run()
+		if err != nil {
+			return err
+		}
+		// Check if a separate dark mode background URI is available and set it too
+		out, err := parseDconf("gsettings", "writable", "org.gnome.desktop.background", "picture-uri-dark")
+		if err == nil && out == "true" {
+			return exec.Command("gsettings", "set", "org.gnome.desktop.background", "picture-uri-dark", strconv.Quote("file://"+file)).Run()
+		}
+		return err
 	}
 
 	switch Desktop {
